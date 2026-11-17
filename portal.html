@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" /><meta name="author" content="Ariel Geovanny Andino Chinchilla">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal Insight - Apps</title>
+    <link rel="icon" href="assets/logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="background-glow glow-1"></div>
+    <div class="background-glow glow-2"></div>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <a href="index.html" class="brand">
+          <img src="assets/logo.png" alt="Logo de la empresa" class="brand-mark" />
+          <span>Portal Insight</span>
+        </a>
+      </header>
+
+      <main class="portal-layout">
+        <div class="top-nav">
+          <button class="app-tile active" data-app="licitscraper" data-url="https://webscraper.insightlatam.com/login">
+            <span class="tile-icon"><img src="assets/webscraper.png" alt="Web Scraper" /></span>
+            <span class="tile-label">LicitScraper</span>
+          </button>
+
+          <button class="app-tile" data-app="solicitudes" data-url="https://vacaciones.insightlatam.com/">
+            <span class="tile-icon"><img src="assets/Solic.png" alt="Solicitudes" /></span>
+            <span class="tile-label">Solicitudes</span>
+          </button>
+
+          <button class="app-tile disabled" data-url="about:blank">
+            <span class="tile-icon"><img src="assets/a.png" alt="Mantenimiento" /></span>
+            <span class="tile-label">Mantenimiento</span>
+          </button>
+
+          <button class="app-tile disabled" data-url="about:blank">
+           <span class="tile-icon"><img src="assets/a.png" alt="Mantenimiento" /></span>
+            <span class="tile-label">Mantenimiento</span>
+          </button>
+        </div>
+
+        <section class="viewer">
+          <div class="viewer-header">
+            <h2 id="viewerTitle">LicitScraper</h2>
+            <a id="openExternalBtn" class="external-link" href="https://webscraper.insightlatam.com/login" target="_blank" rel="noopener noreferrer">Abrir en otra pestaña</a>
+          </div>
+          <div id="viewerFallback" class="viewer-fallback">
+            <h3>No se pudo mostrar esta app dentro del portal</h3>
+            <p>Algunas herramientas bloquean su carga en un iframe por seguridad. Puedes abrirlas directamente en otra pestaña.</p>
+            <a id="fallbackButton" class="fallback-button" href="https://webscraper.insightlatam.com/login" target="_blank" rel="noopener noreferrer">Abrir app</a>
+          </div>
+          <iframe id="appFrame" title="Aplicación del portal" src="https://webscraper.insightlatam.com/login"></iframe>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const cards = document.querySelectorAll('.app-tile');
+      const frame = document.getElementById('appFrame');
+      const viewerTitle = document.getElementById('viewerTitle');
+      const fallback = document.getElementById('viewerFallback');
+      const openExternalBtn = document.getElementById('openExternalBtn');
+      const fallbackButton = document.getElementById('fallbackButton');
+
+      function showFallback(url) {
+        fallback.style.display = 'flex';
+        frame.style.display = 'none';
+        openExternalBtn.href = url;
+        fallbackButton.href = url;
+      }
+
+      function hideFallback() {
+        fallback.style.display = 'none';
+        frame.style.display = 'block';
+      }
+
+      function activateCard(card) {
+        cards.forEach((item) => item.classList.remove('active'));
+        card.classList.add('active');
+
+        const url = card.getAttribute('data-url');
+        const title = card.querySelector('.tile-label').textContent;
+
+        viewerTitle.textContent = title;
+
+        if (url === 'about:blank') {
+          frame.srcdoc = '<div style="font-family: Inter, sans-serif; padding: 24px; color: #64748b;">Próximamente disponible.</div>';
+          hideFallback();
+        } else {
+          frame.removeAttribute('srcdoc');
+          frame.src = url;
+          hideFallback();
+        }
+      }
+
+      cards.forEach((card) => {
+        card.addEventListener('click', () => {
+          if (card.classList.contains('disabled')) return;
+          activateCard(card);
+        });
+      });
+
+      frame.addEventListener('load', () => {
+        hideFallback();
+      });
+
+      // Activate the app specified by the ?app= query param
+      const appParam = new URLSearchParams(window.location.search).get('app');
+      if (appParam) {
+        const target = document.querySelector(`.app-tile[data-app="${appParam}"]`);
+        if (target) activateCard(target);
+      }
+    </script>
+  </body>
+</html>
